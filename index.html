@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recherche Produits</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #1a1a2e;
+      color: white;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    header h1 { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.5px; }
+
+    #btn-settings {
+      background: rgba(255,255,255,0.12);
+      border: none;
+      color: white;
+      padding: 7px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: background 0.2s;
+    }
+    #btn-settings:hover { background: rgba(255,255,255,0.22); }
+
+    /* SETTINGS PANEL */
+    #settings-panel {
+      display: none;
+      background: white;
+      border-bottom: 1px solid #dde1e7;
+      padding: 20px;
+      gap: 14px;
+      flex-direction: column;
+    }
+    #settings-panel.open { display: flex; }
+
+    #settings-panel label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    #settings-panel input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #dde1e7;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: border-color 0.2s;
+    }
+    #settings-panel input:focus {
+      outline: none;
+      border-color: #4f7ef8;
+    }
+
+    #btn-save {
+      background: #4f7ef8;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      align-self: flex-start;
+      transition: background 0.2s;
+    }
+    #btn-save:hover { background: #3a6ae0; }
+
+    #settings-status {
+      font-size: 0.85rem;
+      color: #28a745;
+      display: none;
+    }
+
+    /* SEARCH */
+    .search-wrap {
+      padding: 20px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    #search-input {
+      width: 100%;
+      padding: 14px 18px;
+      font-size: 1.15rem;
+      border: 2px solid #dde1e7;
+      border-radius: 12px;
+      background: white;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    #search-input:focus {
+      outline: none;
+      border-color: #4f7ef8;
+      box-shadow: 0 0 0 4px rgba(79,126,248,0.12);
+    }
+
+    #search-hint {
+      font-size: 0.82rem;
+      color: #999;
+      margin-top: 8px;
+      padding-left: 4px;
+    }
+
+    /* RESULTS */
+    #results {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 0 20px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      transition: transform 0.15s, box-shadow 0.15s;
+      animation: fadeIn 0.18s ease;
+    }
+    .product-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .product-img {
+      width: 52px;
+      height: 52px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #f0f2f5;
+      flex-shrink: 0;
+    }
+
+    .product-img-placeholder {
+      width: 52px;
+      height: 52px;
+      border-radius: 8px;
+      background: #e8eaf0;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+
+    .product-info { flex: 1; min-width: 0; }
+
+    .product-name {
+      font-weight: 600;
+      font-size: 0.97rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 3px;
+    }
+
+    .product-ref {
+      font-size: 0.75rem;
+      color: #999;
+    }
+
+    .product-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .product-price {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1a1a2e;
+    }
+
+    .product-stock {
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+    .stock-ok   { background: #d4edda; color: #155724; }
+    .stock-low  { background: #fff3cd; color: #856404; }
+    .stock-none { background: #f8d7da; color: #721c24; }
+
+    /* STATES */
+    #state-msg {
+      text-align: center;
+      padding: 50px 20px;
+      color: #999;
+      font-size: 0.95rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    #loader {
+      display: none;
+      text-align: center;
+      padding: 30px;
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 22px;
+      height: 22px;
+      border: 3px solid #dde1e7;
+      border-top-color: #4f7ef8;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #no-config-banner {
+      background: #fff8e1;
+      border: 1.5px solid #ffd54f;
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 0.9rem;
+      color: #7a5c00;
+      margin: 20px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🛍️ Prix &amp; Stock</h1>
+  <button id="btn-settings">⚙️ Paramètres</button>
+</header>
+
+<!-- SETTINGS PANEL -->
+<div id="settings-panel">
+  <div>
+    <label>URL de la boutique</label>
+    <input type="url" id="input-url" placeholder="https://maboite.com" autocomplete="off" />
+  </div>
+  <div>
+    <label>Clé API PrestaShop</label>
+    <input type="password" id="input-key" placeholder="Coller la clé API ici" autocomplete="off" />
+  </div>
+  <div style="display:flex; align-items:center; gap:14px;">
+    <button id="btn-save">Enregistrer</button>
+    <span id="settings-status">✓ Enregistré</span>
+  </div>
+</div>
+
+<!-- SEARCH -->
+<div class="search-wrap">
+  <input
+    type="search"
+    id="search-input"
+    placeholder="Nom du produit…"
+    autocomplete="off"
+    autocorrect="off"
+    spellcheck="false"
+  />
+  <div id="search-hint"></div>
+</div>
+
+<div id="no-config-banner" style="display:none;">
+  ⚠️ Configure d'abord l'URL et la clé API dans <strong>⚙️ Paramètres</strong>.
+</div>
+
+<div id="loader"><span class="spinner"></span>Recherche en cours…</div>
+<div id="state-msg">Commence à taper pour chercher un produit.</div>
+<div id="results"></div>
+
+<script>
+  const LS_URL = 'ps_shop_url';
+  const LS_KEY = 'ps_api_key';
+
+  // --- DOM refs ---
+  const btnSettings   = document.getElementById('btn-settings');
+  const settingsPanel = document.getElementById('settings-panel');
+  const inputUrl      = document.getElementById('input-url');
+  const inputKey      = document.getElementById('input-key');
+  const btnSave       = document.getElementById('btn-save');
+  const settingsStatus= document.getElementById('settings-status');
+  const searchInput   = document.getElementById('search-input');
+  const searchHint    = document.getElementById('search-hint');
+  const resultsEl     = document.getElementById('results');
+  const loaderEl      = document.getElementById('loader');
+  const stateMsg      = document.getElementById('state-msg');
+  const noConfigBanner= document.getElementById('no-config-banner');
+
+  // --- Load saved config ---
+  function getConfig() {
+    return {
+      url: localStorage.getItem(LS_URL) || '',
+      key: localStorage.getItem(LS_KEY) || '',
+    };
+  }
+
+  function isConfigured() {
+    const c = getConfig();
+    return c.url && c.key;
+  }
+
+  function initSettings() {
+    const c = getConfig();
+    inputUrl.value = c.url;
+    inputKey.value = c.key;
+    if (!isConfigured()) {
+      noConfigBanner.style.display = 'block';
+      stateMsg.style.display = 'none';
+    }
+  }
+
+  btnSettings.addEventListener('click', () => {
+    settingsPanel.classList.toggle('open');
+  });
+
+  btnSave.addEventListener('click', () => {
+    const url = inputUrl.value.trim().replace(/\/$/, '');
+    const key = inputKey.value.trim();
+    if (!url || !key) { alert('URL et clé API sont requis.'); return; }
+    localStorage.setItem(LS_URL, url);
+    localStorage.setItem(LS_KEY, key);
+    settingsStatus.style.display = 'inline';
+    noConfigBanner.style.display = 'none';
+    stateMsg.style.display = 'block';
+    stateMsg.textContent = 'Commence à taper pour chercher un produit.';
+    setTimeout(() => { settingsStatus.style.display = 'none'; }, 2000);
+    settingsPanel.classList.remove('open');
+  });
+
+  // --- PrestaShop API ---
+  async function psGet(endpoint) {
+    const { url, key } = getConfig();
+    // PrestaShop REST: Basic auth with key as username, empty password
+    const headers = {
+      'Authorization': 'Basic ' + btoa(key + ':'),
+      'Accept': 'application/json',
+    };
+    const res = await fetch(`${url}/api/${endpoint}&output_format=JSON`, { headers });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  }
+
+  async function searchProducts(query) {
+    // Search by name (display_name contains query)
+    const data = await psGet(
+      `products?display=[id,name,price,reference,id_default_image]&filter[name]=[%25${encodeURIComponent(query)}%25]&limit=30`
+    );
+    return data.products || [];
+  }
+
+  async function getStock(productId) {
+    try {
+      const data = await psGet(
+        `stock_availables?display=[quantity]&filter[id_product]=${productId}&limit=1`
+      );
+      const stocks = data.stock_availables;
+      if (stocks && stocks.length > 0) return parseInt(stocks[0].quantity, 10);
+    } catch {}
+    return null;
+  }
+
+  function getImageUrl(productId, imageId) {
+    const { url, key } = getConfig();
+    if (!imageId || imageId === '0') return null;
+    return `${url}/api/images/products/${productId}/${imageId}?ws_key=${key}`;
+  }
+
+  function formatPrice(raw) {
+    const n = parseFloat(raw);
+    if (isNaN(n)) return '—';
+    return n.toFixed(2).replace('.', ',') + ' €';
+  }
+
+  function stockClass(qty) {
+    if (qty === null) return '';
+    if (qty <= 0)  return 'stock-none';
+    if (qty <= 3)  return 'stock-low';
+    return 'stock-ok';
+  }
+
+  function stockLabel(qty) {
+    if (qty === null) return '? en stock';
+    if (qty <= 0) return 'Rupture';
+    return `${qty} en stock`;
+  }
+
+  function renderCard(p, stock) {
+    const imgUrl = getImageUrl(p.id, p.id_default_image);
+    const imgEl = imgUrl
+      ? `<img class="product-img" src="${imgUrl}" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" /><div class="product-img-placeholder" style="display:none">📦</div>`
+      : `<div class="product-img-placeholder">📦</div>`;
+
+    const name = Array.isArray(p.name) ? p.name[0]?.value : (p.name || '—');
+    const sc = stockClass(stock);
+
+    return `
+      <div class="product-card">
+        ${imgEl}
+        <div class="product-info">
+          <div class="product-name" title="${name}">${name}</div>
+          ${p.reference ? `<div class="product-ref">Réf : ${p.reference}</div>` : ''}
+        </div>
+        <div class="product-meta">
+          <div class="product-price">${formatPrice(p.price)}</div>
+          <div class="product-stock ${sc}">${stockLabel(stock)}</div>
+        </div>
+      </div>`;
+  }
+
+  // --- Search logic with debounce ---
+  let debounceTimer = null;
+  let currentQuery  = '';
+
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.trim();
+    clearTimeout(debounceTimer);
+
+    if (q.length < 2) {
+      resultsEl.innerHTML = '';
+      loaderEl.style.display = 'none';
+      stateMsg.style.display  = 'block';
+      stateMsg.textContent = q.length === 0
+        ? 'Commence à taper pour chercher un produit.'
+        : 'Tape au moins 2 caractères.';
+      searchHint.textContent = '';
+      return;
+    }
+
+    if (!isConfigured()) {
+      noConfigBanner.style.display = 'block';
+      return;
+    }
+
+    stateMsg.style.display = 'none';
+    loaderEl.style.display = 'block';
+    resultsEl.innerHTML = '';
+    searchHint.textContent = '';
+
+    debounceTimer = setTimeout(() => doSearch(q), 320);
+  });
+
+  async function doSearch(query) {
+    currentQuery = query;
+    try {
+      const products = await searchProducts(query);
+
+      if (query !== currentQuery) return; // stale
+
+      loaderEl.style.display = 'none';
+
+      if (products.length === 0) {
+        stateMsg.style.display = 'block';
+        stateMsg.textContent = 'Aucun produit trouvé.';
+        return;
+      }
+
+      searchHint.textContent = `${products.length} résultat${products.length > 1 ? 's' : ''}`;
+
+      // Render cards immediately, then fetch stocks in parallel
+      const cards = products.map(p => ({ p, stock: null }));
+      resultsEl.innerHTML = cards.map(c => renderCard(c.p, c.stock)).join('');
+
+      // Fetch stocks in parallel
+      products.forEach(async (p, i) => {
+        const stock = await getStock(p.id);
+        if (query !== currentQuery) return;
+        const cardEl = resultsEl.children[i];
+        if (cardEl) {
+          const sc = stockClass(stock);
+          const badge = cardEl.querySelector('.product-stock');
+          if (badge) {
+            badge.className = `product-stock ${sc}`;
+            badge.textContent = stockLabel(stock);
+          }
+        }
+      });
+
+    } catch (err) {
+      loaderEl.style.display = 'none';
+      stateMsg.style.display = 'block';
+      stateMsg.textContent = `Erreur : ${err.message}. Vérifie l'URL et la clé API dans Paramètres.`;
+    }
+  }
+
+  // --- Init ---
+  initSettings();
+</script>
+</body>
+</html>
