@@ -21,25 +21,30 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 10px;
       position: sticky;
       top: 0;
       z-index: 100;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
 
-    header h1 { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.5px; }
+    header h1 { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.5px; flex: 1; }
 
-    #btn-settings {
+    .header-btns { display: flex; gap: 8px; }
+
+    .hbtn {
       background: rgba(255,255,255,0.12);
       border: none;
       color: white;
       padding: 7px 14px;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       transition: background 0.2s;
+      white-space: nowrap;
     }
-    #btn-settings:hover { background: rgba(255,255,255,0.22); }
+    .hbtn:hover { background: rgba(255,255,255,0.22); }
+    .hbtn.active { color: #a8ff78; background: rgba(168,255,120,0.15); }
 
     /* SETTINGS PANEL */
     #settings-panel {
@@ -89,11 +94,32 @@
     }
     #btn-save:hover { background: #3a6ae0; }
 
-    #settings-status {
-      font-size: 0.85rem;
-      color: #28a745;
+    #settings-status { font-size: 0.85rem; color: #28a745; display: none; }
+
+    /* DEBUG PANEL */
+    #debug-panel {
       display: none;
+      background: #0d1117;
+      color: #c9d1d9;
+      font-family: "Fira Mono", "Consolas", monospace;
+      font-size: 0.78rem;
+      line-height: 1.6;
+      padding: 14px 18px;
+      max-width: 700px;
+      margin: 12px auto 0;
+      border-radius: 10px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 320px;
+      overflow-y: auto;
+      border: 1px solid #30363d;
     }
+    #debug-panel.visible { display: block; }
+    .dbg-err  { color: #ff7b72; }
+    .dbg-ok   { color: #7ee787; }
+    .dbg-info { color: #79c0ff; }
+    .dbg-warn { color: #e3b341; }
+    .dbg-sep  { color: #444; }
 
     /* SEARCH */
     .search-wrap {
@@ -118,12 +144,7 @@
       box-shadow: 0 0 0 4px rgba(79,126,248,0.12);
     }
 
-    #search-hint {
-      font-size: 0.82rem;
-      color: #999;
-      margin-top: 8px;
-      padding-left: 4px;
-    }
+    #search-hint { font-size: 0.82rem; color: #999; margin-top: 8px; padding-left: 4px; }
 
     /* RESULTS */
     #results {
@@ -146,10 +167,7 @@
       transition: transform 0.15s, box-shadow 0.15s;
       animation: fadeIn 0.18s ease;
     }
-    .product-card:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
+    .product-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(6px); }
@@ -157,61 +175,30 @@
     }
 
     .product-img {
-      width: 52px;
-      height: 52px;
-      object-fit: cover;
-      border-radius: 8px;
-      background: #f0f2f5;
-      flex-shrink: 0;
+      width: 52px; height: 52px;
+      object-fit: cover; border-radius: 8px;
+      background: #f0f2f5; flex-shrink: 0;
     }
-
     .product-img-placeholder {
-      width: 52px;
-      height: 52px;
-      border-radius: 8px;
-      background: #e8eaf0;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
+      width: 52px; height: 52px; border-radius: 8px;
+      background: #e8eaf0; flex-shrink: 0;
+      display: flex; align-items: center;
+      justify-content: center; font-size: 1.4rem;
     }
 
     .product-info { flex: 1; min-width: 0; }
-
     .product-name {
-      font-weight: 600;
-      font-size: 0.97rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-bottom: 3px;
+      font-weight: 600; font-size: 0.97rem;
+      white-space: nowrap; overflow: hidden;
+      text-overflow: ellipsis; margin-bottom: 3px;
     }
+    .product-ref { font-size: 0.75rem; color: #999; }
 
-    .product-ref {
-      font-size: 0.75rem;
-      color: #999;
-    }
-
-    .product-meta {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 5px;
-      flex-shrink: 0;
-    }
-
-    .product-price {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #1a1a2e;
-    }
-
+    .product-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+    .product-price { font-size: 1.1rem; font-weight: 700; color: #1a1a2e; }
     .product-stock {
-      font-size: 0.78rem;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 20px;
+      font-size: 0.78rem; font-weight: 600;
+      padding: 2px 8px; border-radius: 20px;
     }
     .stock-ok   { background: #d4edda; color: #155724; }
     .stock-low  { background: #fff3cd; color: #856404; }
@@ -219,46 +206,25 @@
 
     /* STATES */
     #state-msg {
-      text-align: center;
-      padding: 50px 20px;
-      color: #999;
-      font-size: 0.95rem;
-      max-width: 700px;
-      margin: 0 auto;
+      text-align: center; padding: 50px 20px;
+      color: #999; font-size: 0.95rem;
+      max-width: 700px; margin: 0 auto;
     }
 
-    #loader {
-      display: none;
-      text-align: center;
-      padding: 30px;
-      color: #888;
-      font-size: 0.9rem;
-    }
-
+    #loader { display: none; text-align: center; padding: 30px; color: #888; font-size: 0.9rem; }
     .spinner {
-      display: inline-block;
-      width: 22px;
-      height: 22px;
-      border: 3px solid #dde1e7;
-      border-top-color: #4f7ef8;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      vertical-align: middle;
-      margin-right: 8px;
+      display: inline-block; width: 22px; height: 22px;
+      border: 3px solid #dde1e7; border-top-color: #4f7ef8;
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+      vertical-align: middle; margin-right: 8px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     #no-config-banner {
-      background: #fff8e1;
-      border: 1.5px solid #ffd54f;
-      border-radius: 10px;
-      padding: 14px 18px;
-      font-size: 0.9rem;
-      color: #7a5c00;
-      margin: 20px;
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
+      background: #fff8e1; border: 1.5px solid #ffd54f;
+      border-radius: 10px; padding: 14px 18px;
+      font-size: 0.9rem; color: #7a5c00;
+      margin: 20px auto; max-width: 700px;
     }
   </style>
 </head>
@@ -266,35 +232,39 @@
 
 <header>
   <h1>🛍️ Prix &amp; Stock</h1>
-  <button id="btn-settings">⚙️ Paramètres</button>
+  <div class="header-btns">
+    <button class="hbtn" id="btn-debug">🐛 Debug</button>
+    <button class="hbtn" id="btn-settings">⚙️ Paramètres</button>
+  </div>
 </header>
 
 <!-- SETTINGS PANEL -->
 <div id="settings-panel">
   <div>
     <label>URL de la boutique</label>
-    <input type="url" id="input-url" placeholder="https://maboite.com" autocomplete="off" />
+    <input type="url" id="input-url" placeholder="https://lesgentlemendujeu.com" autocomplete="off" />
   </div>
   <div>
     <label>Clé API PrestaShop</label>
     <input type="password" id="input-key" placeholder="Coller la clé API ici" autocomplete="off" />
   </div>
-  <div style="display:flex; align-items:center; gap:14px;">
+  <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
     <button id="btn-save">Enregistrer</button>
+    <button id="btn-test" style="background:#f0f2f5;border:1.5px solid #dde1e7;padding:9px 18px;border-radius:8px;font-size:0.9rem;cursor:pointer;">🔍 Tester la connexion</button>
     <span id="settings-status">✓ Enregistré</span>
   </div>
 </div>
 
+<!-- DEBUG PANEL -->
+<div class="search-wrap" style="padding-bottom:0;">
+  <div id="debug-panel"></div>
+</div>
+
 <!-- SEARCH -->
 <div class="search-wrap">
-  <input
-    type="search"
-    id="search-input"
+  <input type="search" id="search-input"
     placeholder="Nom du produit…"
-    autocomplete="off"
-    autocorrect="off"
-    spellcheck="false"
-  />
+    autocomplete="off" autocorrect="off" spellcheck="false" />
   <div id="search-hint"></div>
 </div>
 
@@ -310,21 +280,47 @@
   const LS_URL = 'ps_shop_url';
   const LS_KEY = 'ps_api_key';
 
-  // --- DOM refs ---
-  const btnSettings   = document.getElementById('btn-settings');
-  const settingsPanel = document.getElementById('settings-panel');
-  const inputUrl      = document.getElementById('input-url');
-  const inputKey      = document.getElementById('input-key');
-  const btnSave       = document.getElementById('btn-save');
-  const settingsStatus= document.getElementById('settings-status');
-  const searchInput   = document.getElementById('search-input');
-  const searchHint    = document.getElementById('search-hint');
-  const resultsEl     = document.getElementById('results');
-  const loaderEl      = document.getElementById('loader');
-  const stateMsg      = document.getElementById('state-msg');
-  const noConfigBanner= document.getElementById('no-config-banner');
+  const btnSettings    = document.getElementById('btn-settings');
+  const btnDebug       = document.getElementById('btn-debug');
+  const settingsPanel  = document.getElementById('settings-panel');
+  const inputUrl       = document.getElementById('input-url');
+  const inputKey       = document.getElementById('input-key');
+  const btnSave        = document.getElementById('btn-save');
+  const btnTest        = document.getElementById('btn-test');
+  const settingsStatus = document.getElementById('settings-status');
+  const searchInput    = document.getElementById('search-input');
+  const searchHint     = document.getElementById('search-hint');
+  const resultsEl      = document.getElementById('results');
+  const loaderEl       = document.getElementById('loader');
+  const stateMsg       = document.getElementById('state-msg');
+  const noConfigBanner = document.getElementById('no-config-banner');
+  const debugPanel     = document.getElementById('debug-panel');
 
-  // --- Load saved config ---
+  let debugMode = false;
+  const debugLog = [];
+
+  function log(type, msg) {
+    const ts = new Date().toLocaleTimeString('fr-FR', { hour12: false });
+    const classMap = { err: 'dbg-err', ok: 'dbg-ok', info: 'dbg-info', warn: 'dbg-warn' };
+    const prefix = { err: '✗', ok: '✓', info: '→', warn: '⚠' }[type] || '·';
+    const entry = `<span class="${classMap[type] || ''}">[${ts}] ${prefix} ${msg}</span>`;
+    debugLog.push(entry);
+    if (debugLog.length > 80) debugLog.shift();
+    if (debugMode) renderDebug();
+  }
+
+  function renderDebug() {
+    debugPanel.innerHTML = debugLog.join('\n') || '<span class="dbg-info">Aucun log pour l\'instant.</span>';
+    debugPanel.scrollTop = debugPanel.scrollHeight;
+  }
+
+  btnDebug.addEventListener('click', () => {
+    debugMode = !debugMode;
+    btnDebug.classList.toggle('active', debugMode);
+    debugPanel.classList.toggle('visible', debugMode);
+    if (debugMode) renderDebug();
+  });
+
   function getConfig() {
     return {
       url: localStorage.getItem(LS_URL) || '',
@@ -357,6 +353,8 @@
     if (!url || !key) { alert('URL et clé API sont requis.'); return; }
     localStorage.setItem(LS_URL, url);
     localStorage.setItem(LS_KEY, key);
+    log('ok', `Config sauvegardée — URL: ${url}`);
+    log('info', `Clé API: ${key.slice(0,6)}${'*'.repeat(Math.max(0, key.length-6))}`);
     settingsStatus.style.display = 'inline';
     noConfigBanner.style.display = 'none';
     stateMsg.style.display = 'block';
@@ -365,25 +363,132 @@
     settingsPanel.classList.remove('open');
   });
 
+  // --- Connection test ---
+  btnTest.addEventListener('click', async () => {
+    const url = inputUrl.value.trim().replace(/\/$/, '');
+    const key = inputKey.value.trim();
+    if (!url || !key) { alert('Remplis l\'URL et la clé avant de tester.'); return; }
+
+    if (!debugMode) { btnDebug.click(); } // auto-open debug
+    btnTest.textContent = '⏳ Test…';
+    btnTest.disabled = true;
+
+    log('info', `TEST connexion → ${url}/api/`);
+    log('info', `Clé: ${key.slice(0,6)}${'*'.repeat(Math.max(0,key.length-6))}`);
+
+    try {
+      const headers = { 'Authorization': 'Basic ' + btoa(key + ':'), 'x-requested-with': 'XMLHttpRequest' };
+      log('info', `Header Authorization: Basic ${btoa(key + ':').slice(0,12)}…`);
+
+      const res = await fetchWithProxy(`${url}/api/?output_format=JSON`, headers);
+      log(res.ok ? 'ok' : 'err', `HTTP ${res.status} ${res.statusText}`);
+
+      // Log response headers
+      res.headers.forEach((v, k) => {
+        if (['content-type','access-control-allow-origin','x-powered-by'].includes(k.toLowerCase())) {
+          log('info', `Header réponse — ${k}: ${v}`);
+        }
+      });
+
+      const text = await res.text();
+      log('info', `Corps réponse (200 premiers chars): ${text.slice(0,200)}`);
+
+      if (res.ok) {
+        log('ok', '✅ Connexion réussie ! API accessible.');
+      } else if (res.status === 401) {
+        log('err', '401 — Clé API invalide ou permissions insuffisantes.');
+      } else if (res.status === 403) {
+        log('err', '403 — Accès refusé. Vérifie les permissions GET dans PrestaShop.');
+      } else if (res.status === 404) {
+        log('err', '404 — URL incorrecte ou API PrestaShop désactivée (Paramètres > Web service).');
+      }
+    } catch (e) {
+      log('err', `Fetch échoué: ${e.message}`);
+      if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
+        log('warn', 'Cause probable : CORS bloqué ou URL inaccessible depuis ce navigateur.');
+        log('info', 'Solution CORS → ajoute dans .htaccess:');
+        log('info', 'Header always set Access-Control-Allow-Origin "*"');
+        log('info', 'Header always set Access-Control-Allow-Headers "Authorization"');
+      }
+    }
+
+    btnTest.textContent = '🔍 Tester la connexion';
+    btnTest.disabled = false;
+  });
+
   // --- PrestaShop API ---
+  const PROXIES = [
+    u => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
+    u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+    u => `https://cors-anywhere.herokuapp.com/${u}`,
+  ];
+
+  async function fetchWithProxy(targetUrl, headers) {
+    // Try direct first (works if hosted on same domain)
+    try {
+      const r = await fetch(targetUrl, { headers });
+      log('ok', `Direct OK (même domaine)`);
+      return r;
+    } catch {}
+
+    for (let i = 0; i < PROXIES.length; i++) {
+      const proxyUrl = PROXIES[i](targetUrl);
+      const proxyName = ['corsproxy.io', 'allorigins', 'cors-anywhere'][i];
+      log('info', `Essai proxy ${i+1}/3 (${proxyName})…`);
+      try {
+        const r = await fetch(proxyUrl, { headers, signal: AbortSignal.timeout(8000) });
+        if (r.ok || r.status < 500) {
+          log('ok', `Proxy ${proxyName} → HTTP ${r.status}`);
+          return r;
+        }
+        log('warn', `Proxy ${proxyName} → HTTP ${r.status}, essai suivant`);
+      } catch (e) {
+        log('warn', `Proxy ${proxyName} échoué: ${e.message}`);
+      }
+    }
+    throw new Error('Tous les proxies ont échoué. Voir debug pour détails.');
+  }
+
   async function psGet(endpoint) {
     const { url, key } = getConfig();
-    // PrestaShop REST: Basic auth with key as username, empty password
+    const apiUrl = `${url}/api/${endpoint}&output_format=JSON`;
+    log('info', `GET ${endpoint.split('?')[0]}`);
+
     const headers = {
       'Authorization': 'Basic ' + btoa(key + ':'),
-      'Accept': 'application/json',
+      'x-requested-with': 'XMLHttpRequest',
     };
-    const res = await fetch(`${url}/api/${endpoint}&output_format=JSON`, { headers });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
+
+    let res;
+    try {
+      res = await fetchWithProxy(apiUrl, headers);
+    } catch (e) {
+      log('err', `Fetch échoué: ${e.message}`);
+      throw e;
+    }
+
+    log(res.ok ? 'ok' : 'err', `→ HTTP ${res.status}`);
+
+    if (!res.ok) {
+      const body = await res.text().catch(() => '');
+      log('err', `Corps erreur: ${body.slice(0, 150)}`);
+      throw new Error(`HTTP ${res.status} — ${body.slice(0,80)}`);
+    }
+
+    const json = await res.json().catch(async () => {
+      log('err', 'Réponse non-JSON');
+      throw new Error('Réponse non-JSON');
+    });
+    return json;
   }
 
   async function searchProducts(query) {
-    // Search by name (display_name contains query)
     const data = await psGet(
       `products?display=[id,name,price,reference,id_default_image]&filter[name]=[%25${encodeURIComponent(query)}%25]&limit=30`
     );
-    return data.products || [];
+    const products = data.products || [];
+    log('ok', `${products.length} produit(s) trouvé(s)`);
+    return products;
   }
 
   async function getStock(productId) {
@@ -425,7 +530,7 @@
   function renderCard(p, stock) {
     const imgUrl = getImageUrl(p.id, p.id_default_image);
     const imgEl = imgUrl
-      ? `<img class="product-img" src="${imgUrl}" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" /><div class="product-img-placeholder" style="display:none">📦</div>`
+      ? `<img class="product-img" src="${imgUrl}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" /><div class="product-img-placeholder" style="display:none">📦</div>`
       : `<div class="product-img-placeholder">📦</div>`;
 
     const name = Array.isArray(p.name) ? p.name[0]?.value : (p.name || '—');
@@ -445,7 +550,7 @@
       </div>`;
   }
 
-  // --- Search logic with debounce ---
+  // --- Search with debounce ---
   let debounceTimer = null;
   let currentQuery  = '';
 
@@ -479,11 +584,11 @@
 
   async function doSearch(query) {
     currentQuery = query;
+    log('info', `──── Recherche: "${query}" ────`);
     try {
       const products = await searchProducts(query);
 
-      if (query !== currentQuery) return; // stale
-
+      if (query !== currentQuery) return;
       loaderEl.style.display = 'none';
 
       if (products.length === 0) {
@@ -493,21 +598,16 @@
       }
 
       searchHint.textContent = `${products.length} résultat${products.length > 1 ? 's' : ''}`;
+      resultsEl.innerHTML = products.map(p => renderCard(p, null)).join('');
 
-      // Render cards immediately, then fetch stocks in parallel
-      const cards = products.map(p => ({ p, stock: null }));
-      resultsEl.innerHTML = cards.map(c => renderCard(c.p, c.stock)).join('');
-
-      // Fetch stocks in parallel
       products.forEach(async (p, i) => {
         const stock = await getStock(p.id);
         if (query !== currentQuery) return;
         const cardEl = resultsEl.children[i];
         if (cardEl) {
-          const sc = stockClass(stock);
           const badge = cardEl.querySelector('.product-stock');
           if (badge) {
-            badge.className = `product-stock ${sc}`;
+            badge.className = `product-stock ${stockClass(stock)}`;
             badge.textContent = stockLabel(stock);
           }
         }
@@ -516,11 +616,14 @@
     } catch (err) {
       loaderEl.style.display = 'none';
       stateMsg.style.display = 'block';
-      stateMsg.textContent = `Erreur : ${err.message}. Vérifie l'URL et la clé API dans Paramètres.`;
+      stateMsg.textContent = `Erreur : ${err.message}`;
+      log('err', `Erreur recherche: ${err.message}`);
+      if (!debugMode) {
+        stateMsg.textContent += ' — Active le mode 🐛 Debug pour plus de détails.';
+      }
     }
   }
 
-  // --- Init ---
   initSettings();
 </script>
 </body>
